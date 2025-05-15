@@ -27,8 +27,8 @@ L'objectif restera de pouvoir mettre à jour rapidement et simplement la base de
 Suggestions de développement :
 
   Index :
-  - Ajouter un logo au-dessus du quizz (au-dessus du choix du quizz)
-  - Ajouter un encart expliquant brièvement le rôle de l'application et en particulier le public destinataire (en-dessous de la sélection du quizz pour éviter d'avoir à scroller quand on est un habitué ?)
+  - [Fait] Ajouter un logo au-dessus du quizz (au-dessus du choix du quizz)
+  - [Fait] Ajouter un encart expliquant brièvement le rôle de l'application et en particulier le public destinataire (en-dessous de la sélection du quizz pour éviter d'avoir à scroller quand on est un habitué ?)
   - Ajouter le module UC règles
   - Ajouter un lien vers les bulletins de la FFBS au sujet de l'arbitrage (en-dessous du choix du quizz)
   - Ajouter d'autres liens utiles
