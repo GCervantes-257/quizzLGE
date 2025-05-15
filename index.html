@@ -49,6 +49,28 @@
       .settings, .question-container, #result { padding: 0.6em; }
       .correction-btn { font-size: 0.7em; padding: 0.2em 0.4em; }
     }
+
+    #homePageBtn {
+      background: #0b3d91;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6em 1.2em;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    #homePageBtn:hover {
+      background: #094080;
+      transform: scale(1.05);
+    }
+
+    #homePageBtn:active {
+      transform: scale(0.95);
+    }
   </style>
 </head>
 <body>
@@ -57,6 +79,10 @@
     <div class="logos" style="text-align: center; margin-bottom: 1em;">
       <img src="https://i.postimg.cc/y6b0h4Nf/logoliguegrandest.png" alt="Logo 1" style="width: 100px; height: auto; margin-right: 1em; border: 1px solid #ddd; border-radius: 4px;">
       <img src="https://i.postimg.cc/Kv3BJqkm/logocrabgrandest.jpg" alt="Logo 2" style="width: 100px; height: auto; border: 1px solid #ddd; border-radius: 4px;">
+      <!-- Update "Retour à l'accueil" button -->
+      <button id="homePageBtn" class="hidden" onclick="reloadHome()" style="margin-top:1em;background:#0b3d91;color:#fff;border:none;border-radius:6px;padding:0.6em 1.2em;font-size:1em;font-weight:bold;cursor:pointer;box-shadow:0 4px 6px rgba(0,0,0,0.1);transition:transform 0.2s, background 0.2s;">
+        Retour à l'accueil
+      </button>
     </div>
     <h1>QCM Arbitrage – CRA Grand Est</h1>
     <!-- Add introductory section -->
@@ -81,6 +107,7 @@
     <div id="settings" class="settings">
       <label for="level">Choisir le niveau :</label>
       <select id="level">
+        <option value="UCR">UC Règles</option>
         <option value="JA">JA - Jeune arbitre (12–18 ans)</option>
         <option value="AF1BS">AF1 BS - Arbitre Fédéral niveau 1 Baseball & Softball</option>
         <option value="AF2B">AF2 B - Arbitre Fédéral niveau 2 Baseball</option>
@@ -120,7 +147,8 @@
     "AF2B": "Arbitre Fédéral niveau 2 Baseball, AF2 B",
     "AF2S": "Arbitre Fédéral niveau 2 Softball, AF2 S",
     "AF3B": "Arbitre Fédéral niveau 3 Baseball, AF3 B",
-    "AF3S": "Arbitre Fédéral niveau 3 Softball, AF3 S"
+    "AF3S": "Arbitre Fédéral niveau 3 Softball, AF3 S",
+    "UCR": "UC Règles, connaissances de base sur les règles du baseball"
   };
 
   const allowedCompetitions = {
@@ -129,7 +157,8 @@
     "AF2B": "Régional seniors & désignation en nationaux (baseball)",
     "AF2S": "Régional seniors & désignation en nationaux (softball)",
     "AF3B": "Championnat national senior (D1–D3) & interrégionaux baseball",
-    "AF3S": "Divisions 1 F/M & interrégionaux softball"
+    "AF3S": "Divisions 1 F/M & interrégionaux softball",
+    "UCR": "Pas de compétition, niveau de base"
   };
 
   levelSelect.addEventListener('change', updateSettings);
@@ -198,15 +227,27 @@
   function startQuiz() {
     // Hide the intro section when the quiz starts
     document.getElementById('intro').classList.add('hidden');
+    document.getElementById('homePageBtn').classList.remove('hidden'); // Show "Retour à l'accueil" button
 
     const lvl = levelSelect.value.trim().toUpperCase();
-    let pool = questions.filter(q => (q.level || '').trim().toUpperCase() === lvl);
+    let pool;
+
+    if (lvl === "UCR") {
+      // Special handling for UC Règles
+      pool = questions.filter(q => (q.ucregles || '').trim().toLowerCase() === 'oui');
+    } else {
+      // Default behavior for other levels
+      pool = questions.filter(q => (q.level || '').trim().toUpperCase() === lvl);
+    }
+
     pool = pool.filter((q, i, self) => self.findIndex(item => item.id === q.id) === i);
     console.log("Questions trouvées pour", lvl, ":", pool.length);
+
     if (pool.length === 0) {
       alert("Aucune question disponible pour ce niveau.");
       return;
     }
+
     const selected = shuffle(pool).slice(0, 10);
     const levelName = levelSelect.options[levelSelect.selectedIndex].text;
     quizInfoDiv.textContent = `Niveau en cours : ${levelName}`;
@@ -259,7 +300,7 @@
     skipEmptyLines: true,
     complete: function(results) {
       questions = results.data
-        .filter(row => row.level && row.question && row.option1 && row["answer (indice 0-3)"] !== '')
+        .filter(row => row.question && row.option1 && (row["answer (indice 0-3)"] !== '' || row.ucregles))
         .map(row => ({
           id: row.id,
           level: row.level,
@@ -270,6 +311,7 @@
           ref: row["ref texte officiel"],
           img: row["img"],
           rimg: row["rimg"],
+          ucregles: row.ucregles // Add the "ucregles" column
         }));
       startBtn.disabled = false;
       startBtn.textContent = 'Démarrer le quiz';
@@ -283,6 +325,7 @@
   function goBackToHome() {
     // Show the intro section when returning to the home screen
     document.getElementById('intro').classList.remove('hidden');
+    document.getElementById('homePageBtn').classList.add('hidden'); // Hide "Retour à l'accueil" button
 
     settingsDiv.classList.remove('hidden');
     quizDiv.classList.add('hidden');
@@ -293,6 +336,10 @@
     resultDiv.innerHTML = '';
     levelSelect.selectedIndex = 0;
     updateSettings();
+  }
+
+  function reloadHome() {
+    location.reload(); // Reload the page to return to the home screen
   }
 
   function openCorrectionForm(id, q) {
