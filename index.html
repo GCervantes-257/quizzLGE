@@ -59,6 +59,25 @@
       <img src="https://i.postimg.cc/Kv3BJqkm/logocrabgrandest.jpg" alt="Logo 2" style="width: 100px; height: auto; border: 1px solid #ddd; border-radius: 4px;">
     </div>
     <h1>QCM Arbitrage – CRA Grand Est</h1>
+    <!-- Add introductory section -->
+    <div id="intro" class="settings" style="margin-bottom: 1em;">
+      <h2>À qui est destiné ce quizz ?</h2>
+      <p>
+        Ce quizz est destiné à tous ceux qui veulent en connaître davantage sur les règles du baseball !
+      </p>
+      <p>
+        Développé par et pour la CRA de la Ligue Grand Est, elle est destinée à tous !
+      </p>
+      <p>
+        Que vous découvriez le baseball, que vous prépariez un des diplômes reconnus par la FFBS ou que vous souhaitiez réviser, cette application est faite pour vous !
+      </p>
+      <p>
+        Très rapide à utiliser, idéale pour réviser rapidement, à l'aide d'un mobile ou d'un ordinateur, emportez-la partout avec vous !
+      </p>
+      <p>
+        Cette application a été développée bénévolement. Vous pouvez à tout moment nous signaler des corrections.
+      </p>
+    </div>
     <div id="settings" class="settings">
       <label for="level">Choisir le niveau :</label>
       <select id="level">
@@ -177,6 +196,9 @@
   }
 
   function startQuiz() {
+    // Hide the intro section when the quiz starts
+    document.getElementById('intro').classList.add('hidden');
+
     const lvl = levelSelect.value.trim().toUpperCase();
     let pool = questions.filter(q => (q.level || '').trim().toUpperCase() === lvl);
     pool = pool.filter((q, i, self) => self.findIndex(item => item.id === q.id) === i);
@@ -259,6 +281,9 @@
   });
 
   function goBackToHome() {
+    // Show the intro section when returning to the home screen
+    document.getElementById('intro').classList.remove('hidden');
+
     settingsDiv.classList.remove('hidden');
     quizDiv.classList.add('hidden');
     submitBtn.classList.add('hidden');
