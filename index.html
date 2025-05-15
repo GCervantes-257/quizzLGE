@@ -83,6 +83,10 @@
       <button id="homePageBtn" class="hidden" onclick="reloadHome()" style="margin-top:1em;background:#0b3d91;color:#fff;border:none;border-radius:6px;padding:0.6em 1.2em;font-size:1em;font-weight:bold;cursor:pointer;box-shadow:0 4px 6px rgba(0,0,0,0.1);transition:transform 0.2s, background 0.2s;">
         Retour à l'accueil
       </button>
+      <!-- Add "Proposer une question" button -->
+      <button id="proposeQuestionBtn" class="hidden" onclick="toggleProposeQuestion()" style="margin-top:1em;background:#0b3d91;color:#fff;border:none;border-radius:6px;padding:0.6em 1.2em;font-size:1em;font-weight:bold;cursor:pointer;box-shadow:0 4px 6px rgba(0,0,0,0.1);transition:transform 0.2s, background 0.2s;">
+        Proposer une question
+      </button>
     </div>
     <h1>QCM Arbitrage – CRA Grand Est</h1>
     <!-- Add introductory section -->
@@ -124,6 +128,38 @@
     <button id="submitBtn" class="hidden" onclick="submitQuiz()">Valider mes réponses</button>
     <button id="homeBtn" class="hidden" onclick="goBackToHome()" style="margin-top:1em;background:#e0eaff;border:none;border-radius:6px;padding:0.5em 1em;">⬅️ Revenir à l’accueil</button>
     <div id="result" class="hidden"></div>
+
+    <div id="proposeQuestion" class="settings hidden" style="margin-top: 1em;">
+      <h2>Proposer une question</h2>
+      <p>Remplissez les champs ci-dessous pour proposer une nouvelle question. Si vous voulez ajouter des images, les joindre au présent mail. Merci pour votre contribution !</p>
+      <div style="margin-bottom: 1em;">
+        <label for="proposeLevel">Niveau :</label>
+        <input id="proposeLevel" type="text" placeholder="Exemple : JA, AF1BS, etc." style="width: 100%; padding: 0.5em; margin-top: 0.3em; border: 1px solid #ccc; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1em;">
+        <label for="proposeQuestionText">Question :</label>
+        <textarea id="proposeQuestionText" placeholder="Écrivez la question ici..." style="width: 100%; padding: 0.5em; margin-top: 0.3em; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+      </div>
+      <div style="margin-bottom: 1em;">
+        <label for="proposeOptions">Options (une par ligne) :</label>
+        <textarea id="proposeOptions" placeholder="Option 1\nOption 2\nOption 3\nOption 4" style="width: 100%; padding: 0.5em; margin-top: 0.3em; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+      </div>
+      <div style="margin-bottom: 1em;">
+        <label for="proposeAnswers">Réponse(s) correcte(s) (indices séparés par des virgules, ex : 0,1) :</label>
+        <input id="proposeAnswers" type="text" placeholder="Exemple : 0,1" style="width: 100%; padding: 0.5em; margin-top: 0.3em; border: 1px solid #ccc; border-radius: 4px;">
+      </div>
+      <div style="margin-bottom: 1em;">
+        <label for="proposeExplanation">Explication :</label>
+        <textarea id="proposeExplanation" placeholder="Ajoutez une explication pour la réponse correcte..." style="width: 100%; padding: 0.5em; margin-top: 0.3em; border: 1px solid #ccc; border-radius: 4px;"></textarea>
+      </div>
+      <div style="margin-bottom: 1em;">
+        <label for="proposeReference">Référence (texte officiel) :</label>
+        <input id="proposeReference" type="text" placeholder="Exemple : Article 5.1" style="width: 100%; padding: 0.5em; margin-top: 0.3em; border: 1px solid #ccc; border-radius: 4px;">
+      </div>
+      <button onclick="sendProposedQuestion()" style="background: #0b3d91; color: #fff; border: none; border-radius: 6px; padding: 0.6em 1.2em; font-size: 1em; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s, background 0.2s;">
+        📤 Envoyer la proposition
+      </button>
+    </div>
   </div>
 
   
@@ -228,6 +264,7 @@
     // Hide the intro section when the quiz starts
     document.getElementById('intro').classList.add('hidden');
     document.getElementById('homePageBtn').classList.remove('hidden'); // Show "Retour à l'accueil" button
+    document.getElementById('proposeQuestionBtn').classList.remove('hidden'); // Show "Proposer une question" button
 
     const lvl = levelSelect.value.trim().toUpperCase();
     let pool;
@@ -326,6 +363,7 @@
     // Show the intro section when returning to the home screen
     document.getElementById('intro').classList.remove('hidden');
     document.getElementById('homePageBtn').classList.add('hidden'); // Hide "Retour à l'accueil" button
+    document.getElementById('proposeQuestionBtn').classList.add('hidden'); // Hide "Proposer une question" button
 
     settingsDiv.classList.remove('hidden');
     quizDiv.classList.add('hidden');
@@ -434,6 +472,47 @@
       resultAnswerElement.appendChild(container);
     } else {
       document.getElementById('result').appendChild(container);
+    }
+  }
+
+  function sendProposedQuestion() {
+    const level = document.getElementById('proposeLevel').value.trim();
+    const questionText = document.getElementById('proposeQuestionText').value.trim();
+    const options = document.getElementById('proposeOptions').value.trim().split('\n').filter(opt => opt);
+    const answers = document.getElementById('proposeAnswers').value.trim();
+    const explanation = document.getElementById('proposeExplanation').value.trim();
+    const reference = document.getElementById('proposeReference').value.trim();
+
+    if (!level || !questionText || options.length === 0 || !answers) {
+      alert("Veuillez remplir tous les champs obligatoires (niveau, question, options, réponses).");
+      return;
+    }
+
+    let emailBody = "Bonjour,\n\nVoici une proposition de question :\n\n";
+    emailBody += `Niveau : ${level}\n`;
+    emailBody += `Question : ${questionText}\n`;
+    emailBody += `Options :\n${options.map((opt, idx) => `  ${idx + 1}. ${opt}`).join('\n')}\n`;
+    emailBody += `Réponse(s) correcte(s) : ${answers}\n`;
+    emailBody += `Explication : ${explanation}\n`;
+    emailBody += `Référence : ${reference}\n\n`;
+    emailBody += "Si vous voulez ajouter des images, les joindre au présent mail. Merci pour votre contribution !";
+
+    const email = "arbitrage.liguegrandest@gmail.com";
+    const subject = encodeURIComponent("Proposition de question");
+    const body = encodeURIComponent(emailBody);
+    const mailtoLink = `mailto:${email}?subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+
+    alert("Merci ! Votre proposition de question a bien été préparée pour envoi.");
+  }
+
+  function toggleProposeQuestion() {
+    const proposeQuestionDiv = document.getElementById('proposeQuestion');
+    if (proposeQuestionDiv.classList.contains('hidden')) {
+      proposeQuestionDiv.classList.remove('hidden');
+      window.scrollTo({ top: proposeQuestionDiv.offsetTop, behavior: 'smooth' });
+    } else {
+      proposeQuestionDiv.classList.add('hidden');
     }
   }
 </script>
