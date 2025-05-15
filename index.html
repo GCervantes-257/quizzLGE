@@ -337,8 +337,12 @@
         ok = sel && parseInt(sel.value, 10) === q.answers[0];
       }
       if (ok) score++;
-      output += `<p>Q${i + 1} : ${ok ? '✅ Bonne réponse' : '❌ Mauvaise réponse'}<br>
-        <em>${q.explanation || ''}</em>`;
+      const correctAnswersText = q.answers.map(index => q.options[index]).join(', ');
+      output += `<p>Q${i + 1} : ${ok ? '✅ Bonne réponse' : '❌ Mauvaise réponse'}<br>`;
+      if (!ok) {
+        output += `<strong>Réponse(s) correcte(s) :</strong> ${correctAnswersText}<br>`;
+      }
+      output += `<em>${q.explanation || ''}</em>`;
       if (q.ref) {
         output += `<br><small style="color:#555;">📘 Référence : ${q.ref}</small>`;
       }
